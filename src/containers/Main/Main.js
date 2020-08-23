@@ -23,7 +23,6 @@ const reducer = (state, action) => {
 
 const Main = () => {
   const [postData, setPostData] = React.useState([]);
-  const perPage = 3;
   const [getData, setGetData] = React.useState(true);
   React.useEffect(() => {
     axios
