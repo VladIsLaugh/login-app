@@ -1,5 +1,6 @@
 import React from "react";
 import PostItem from "./../../components/PostItem/PostItem";
+
 import axios from "axios";
 
 const reducer = (state, action) => {
@@ -24,6 +25,7 @@ const reducer = (state, action) => {
 const Main = () => {
   const [postData, setPostData] = React.useState([]);
   const [getData, setGetData] = React.useState(true);
+
   React.useEffect(() => {
     axios
       .get(
@@ -42,6 +44,7 @@ const Main = () => {
   const { loading, data, after } = state;
   return (
     <div>
+     
       <ul>
         {data.map((item, index) => {
           return (
