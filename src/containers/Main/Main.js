@@ -1,5 +1,6 @@
 import React from "react";
 import PostItem from "./../../components/PostItem/PostItem";
+import Logout from "../../components/Logout/Logout";
 
 import axios from "axios";
 
@@ -44,7 +45,7 @@ const Main = () => {
   const { loading, data, after } = state;
   return (
     <div>
-     
+     <Logout />
       <ul>
         {data.map((item, index) => {
           return (

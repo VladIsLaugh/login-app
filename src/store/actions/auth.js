@@ -1,5 +1,19 @@
 import {token} from '../../token'
 import axios from "axios";
+import * as firebase from "firebase";
+var firebaseConfig = {
+    apiKey: "AIzaSyCQ9w8mFW2cT0TujQfuKBnXkTKmPw4ZzOA",
+    authDomain: "login-25746.firebaseapp.com",
+    databaseURL: "https://login-25746.firebaseio.com",
+    projectId: "login-25746",
+    storageBucket: "login-25746.appspot.com",
+    messagingSenderId: "426151674537",
+    appId: "1:426151674537:web:801c6c8254e476b4d35fb8",
+    measurementId: "G-1QRB5F7MKL",
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
 
 export default function auth(email, password, isLogin){
     return async dispatch =>{
@@ -63,6 +77,7 @@ export function autoLogin(){
 }
 
 export function authSuccess(token){
+    console.log(localStorage.getItem('expirationDate'))
     return{
         type: 'AUTH_SUCCESS',
         token
@@ -70,5 +85,41 @@ export function authSuccess(token){
 }
 
 export function loginFacebook(){
+    return dispatch=>{
+        const provider = new firebase.auth.FacebookAuthProvider();
     
+        firebase
+          .auth()
+          .signInWithPopup(provider)
+          .then(function (result) {
+            localStorage.setItem("isLogged", true);
+            // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+            var token = result.credential.accessToken;
+            console.log(token);
+            dispatch(authSuccess(token))
+            //dispatch(authLogout(data.expiresIn))
+            // The signed-in user info.
+            var user = result.user;
+            let expirationDate = new Date(new Date().getTime()+3600000)
+            console.log(localStorage.getItem('expirationDate'),expirationDate )
+            localStorage.setItem('token', token)
+            localStorage.setItem('expirationDate', expirationDate)
+            return dispatch => {
+                dispatch(authLogout(expirationDate))
+                dispatch(authSuccess(token))
+            }  
+            // ...
+          })
+          .catch(function (error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // The email of the user's account used.
+            var email = error.email;
+            // The firebase.auth.AuthCredential type that was used.
+            var credential = error.credential;
+            // ...
+          })
+    }
+        
 }
