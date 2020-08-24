@@ -1,12 +1,12 @@
 import React from "react";
 import classes from "./Login.module.css";
-import ReactDOM from "react-dom";
+
 import TextField from "@material-ui/core/TextField";
 import Alert from "@material-ui/lab/Alert";
 import Button from "@material-ui/core/Button";
-import { token } from "../../token";
-import axios from "axios";
 import * as firebase from "firebase";
+import { connect } from "react-redux";
+import auth from '../../store/actions/auth'
 
 var firebaseConfig = {
   apiKey: "AIzaSyCQ9w8mFW2cT0TujQfuKBnXkTKmPw4ZzOA",
@@ -28,42 +28,13 @@ const Login = (props) => {
   //const [authState, setAuthState] = React.useState(false)
   const [alert, setAlert] = React.useState(null);
 
-  const fetchHandler = async (url) => {
-    const authData = {
-      email: email,
-      password: password,
-      returnSecureToken: true,
-    };
-
-    try {
-      const res = await axios.post(`${url}?key=${token}`, authData);
-      console.log(res.data);
-      const data = res.data;
-      props.authHendler(true);
-      setAlert("success");
-      setTimeout(() => setAlert(null), 1000);
-
-      // const expirationDate = new Date(
-      //   new Date().getTime() + data.expiresIn * 1000
-      // );
-      //  localStorage.setItem('token', data.idToken)
-      //  localStorage.setItem('userId', data.localId)
-      //  localStorage.setItem('expirationDate', expirationDate)
-      localStorage.setItem("isLogged", true);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
   const loginHandler = () => {
-    const url =
-      "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword";
-    fetchHandler(url);
+    props.auth( email, password, true)
+    console.log("dasads")
   };
 
   const registrHandler = () => {
-    const url = "https://identitytoolkit.googleapis.com/v1/accounts:signUp";
-    fetchHandler(url);
+    props.auth( email, password, false)
   };
   const logout = () => {
     props.authHendler(false);
@@ -139,4 +110,10 @@ const Login = (props) => {
   );
 };
 
-export default Login;
+function mapDispatchToProps(dispatch){
+  return {
+    auth: (email, password, isLogin) => dispatch(auth(email, password, isLogin))
+  }
+}
+
+export default connect(null, mapDispatchToProps)(Login);

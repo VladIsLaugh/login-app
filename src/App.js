@@ -3,45 +3,55 @@ import React from 'react';
 import Main from './containers/Main/Main'
 import Login from './containers/Login/Login'
 import Button from "@material-ui/core/Button";
+import Logout from "./components/Logout/Logout";
+import {autoLogin} from './store/actions/auth'
 import {
   BrowserRouter as Router,
   Route,
-  Redirect
+  Redirect,
+  useHistory 
 } from "react-router-dom";
+import { connect } from 'react-redux';
 
 
 function App(props) {
-  const [authState, setAuthState] = React.useState(false)
-  const authHendler = (auth) =>{
-    setAuthState(auth)
-    console.log(authState)
-  }
+  let history = useHistory();
   React.useEffect(() => {
-    console.log("useEffect")
-    setAuthState(!!localStorage.getItem('isLogged'))
-  }, []);
+    console.log(props)
+    props.authLogin()
 
-  const logout = () =>{
-    localStorage.setItem("isLogged", false);
-    setAuthState(false)
+  });
+
+  let routes;
+  if(props.isAutenticated){
+    routes= (<> <Route exact  path='/'component={Main} /> <Redirect to="/"  /> </>)
+  }else{
+    routes = (<> <Route path='/login' component={Login} />  <Redirect to="/login"  /> </>)
   }
   return (
     <Router>
+      <Logout />
+      {routes}
     <div className="App">
-    <Button onClick={logout}>logout</Button>
-      {/* <React.Suspense fallback={<div>loading... </div>}> */}
-      {/* {authState&& <Route exact  path='/'component={Main}/>}
-  {!authState&& <Route path='/login'render={()=> <Login authHendler={authHendler}/>}/> } */}
-      {
-        authState
-        ? <Main />
-        : <Login />
-      }
+    {/* <Button onClick={logout}>logout</Button> */}
+
     
-      {/* </React.Suspense> */}
+
     </div>
     </Router>
   );
 }
 
-export default App;
+function mapStateToProps(state){
+  return{
+    isAutenticated: !!state.token
+  }
+}
+
+function mapDispatchToProps(dispatch){
+  return{
+    authLogin: ()=> dispatch(autoLogin())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
